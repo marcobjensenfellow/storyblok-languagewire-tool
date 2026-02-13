@@ -10,9 +10,7 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: [
-    '@storyblok/vue'
-  ],
+  modules: [],
 
   css: ['~/assets/css/main.css'],
 
