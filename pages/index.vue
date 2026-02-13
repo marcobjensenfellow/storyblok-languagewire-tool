@@ -44,9 +44,9 @@
         <select
           id="target-folder"
           v-model="selectedFolder"
-          :disabled="isTranslating"
+          :disabled="isTranslating || isLoadingFolders"
         >
-          <option value="">Vælg mappe</option>
+          <option value="">{{ isLoadingFolders ? 'Henter mapper...' : 'Vælg mappe' }}</option>
           <option
             v-for="folder in folders"
             :key="folder.id"
@@ -91,14 +91,8 @@ const selectedFolder = ref<number | ''>('')
 const isTranslating = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
-
-// Mock data for prototype
-const folders = ref<StoryblokFolder[]>([
-  { id: 1, name: 'Home', slug: 'home', parent_id: null, is_folder: true },
-  { id: 2, name: 'Produkter', slug: 'produkter', parent_id: null, is_folder: true },
-  { id: 3, name: 'Om os', slug: 'om-os', parent_id: null, is_folder: true },
-  { id: 4, name: 'Blog', slug: 'blog', parent_id: null, is_folder: true }
-])
+const folders = ref<StoryblokFolder[]>([])
+const isLoadingFolders = ref(false)
 
 const availableLanguages = ref([
   { code: 'da', name: 'Dansk' },
@@ -156,8 +150,32 @@ const handleTranslate = async () => {
   }
 }
 
+const fetchFolders = async () => {
+  if (!currentSpace.value?.id) return
+
+  isLoadingFolders.value = true
+  try {
+    const response = await $fetch<StoryblokFolder[]>(`/api/folders?space_id=${currentSpace.value.id}`)
+    folders.value = response
+    console.log('Loaded folders:', response)
+    nextTick(() => updateHeight())
+  } catch (error: any) {
+    console.error('Error loading folders:', error)
+    errorMessage.value = 'Kunne ikke hente mapper fra Storyblok'
+  } finally {
+    isLoadingFolders.value = false
+  }
+}
+
 onMounted(() => {
   initBridge()
+
+  // Watch for space to be loaded, then fetch folders
+  watch(() => currentSpace.value, (newSpace) => {
+    if (newSpace?.id) {
+      fetchFolders()
+    }
+  }, { immediate: true })
 
   // For development/testing without Storyblok
   if (import.meta.dev && !currentStory.value) {
@@ -170,6 +188,13 @@ onMounted(() => {
         full_slug: 'test-side',
         parent_id: null,
         lang: 'en'
+      }
+      currentSpace.value = {
+        id: 288946579053471,
+        name: 'Test Space',
+        domain: 'test.storyblok.com',
+        version: 1,
+        language_codes: ['en', 'da']
       }
       updateHeight()
     }, 500)

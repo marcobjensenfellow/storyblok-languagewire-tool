@@ -5,6 +5,7 @@ export default defineNuxtConfig({
     clientId: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
     baseUrl: process.env.BASE_URL,
+    storyblokAccessToken: process.env.STORYBLOK_ACCESS_TOKEN,
     public: {
       baseUrl: process.env.BASE_URL
     }
