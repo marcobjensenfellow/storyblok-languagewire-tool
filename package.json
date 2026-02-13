@@ -1,0 +1,25 @@
+{
+  "name": "storyblok-languagewire-tool",
+  "version": "1.0.0",
+  "description": "Storyblok Tool Plugin for Language Wire translation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@storyblok/vue": "^8.2.0",
+    "nuxt": "^3.13.0",
+    "vue": "^3.4.0",
+    "vue-router": "^4.4.0"
+  },
+  "devDependencies": {
+    "@nuxt/types": "^2.18.0",
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.0"
+  }
+}

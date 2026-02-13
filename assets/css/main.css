@@ -1,0 +1,135 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: #f7f8fa;
+  color: #1b243f;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #1b243f;
+}
+
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d9dce6;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+select:hover {
+  border-color: #09b3af;
+}
+
+select:focus {
+  outline: none;
+  border-color: #09b3af;
+  box-shadow: 0 0 0 3px rgba(9, 179, 175, 0.1);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.btn-primary {
+  background-color: #09b3af;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #088a87;
+}
+
+.btn-primary:disabled {
+  background-color: #d9dce6;
+  cursor: not-allowed;
+}
+
+.info-box {
+  background-color: #f0f9ff;
+  border-left: 4px solid #09b3af;
+  padding: 12px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.info-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.loading {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-message {
+  background-color: #fee;
+  border-left: 4px solid #e53e3e;
+  padding: 12px 16px;
+  border-radius: 4px;
+  color: #c53030;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.success-message {
+  background-color: #f0fdf4;
+  border-left: 4px solid #10b981;
+  padding: 12px 16px;
+  border-radius: 4px;
+  color: #047857;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
