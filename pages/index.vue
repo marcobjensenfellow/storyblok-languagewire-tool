@@ -84,7 +84,7 @@
 <script setup lang="ts">
 import type { StoryblokFolder } from '~/types/storyblok'
 
-const { currentStory, currentSpace, isInitialized, initBridge } = useStoryblokBridge()
+const { currentStory, currentSpace, isInitialized, initBridge, updateHeight } = useStoryblokBridge()
 
 const selectedLanguage = ref('')
 const selectedFolder = ref<number | ''>('')
@@ -139,12 +139,18 @@ const handleTranslate = async () => {
       // Reset form
       selectedLanguage.value = ''
       selectedFolder.value = ''
+
+      // Update height after success message appears
+      nextTick(() => updateHeight())
     } else {
       throw new Error(response.message || 'Oversættelsen fejlede')
     }
   } catch (error: any) {
     errorMessage.value = error.message || 'Der opstod en fejl under oversættelsen'
     console.error('Translation error:', error)
+
+    // Update height after error message appears
+    nextTick(() => updateHeight())
   } finally {
     isTranslating.value = false
   }
@@ -165,7 +171,13 @@ onMounted(() => {
         parent_id: null,
         lang: 'en'
       }
+      updateHeight()
     }, 500)
   }
+
+  // Watch for content changes and update height
+  watch([errorMessage, successMessage], () => {
+    nextTick(() => updateHeight())
+  })
 })
 </script>

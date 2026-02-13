@@ -1,0 +1,8 @@
+{
+  "name": "Language Wire Translation Tool",
+  "version": "1.0.0",
+  "description": "Tool plugin for translating stories via Language Wire",
+  "icon": "https://storyblok-languagewire-tool-kni5.vercel.app/icon.png",
+  "author": "Marco Jensen",
+  "plugin_type": "tool"
+}

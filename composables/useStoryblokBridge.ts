@@ -18,6 +18,9 @@ export const useStoryblokBridge = () => {
 
         console.log('Tool initialized with story:', event.data.story)
         console.log('Space info:', event.data.space)
+
+        // Update height after initialization
+        updateHeight()
       }
     })
 
@@ -27,6 +30,26 @@ export const useStoryblokBridge = () => {
         action: 'tool-ready'
       }, '*')
     }
+
+    // Update height on content changes
+    updateHeight()
+  }
+
+  const updateHeight = () => {
+    if (typeof window === 'undefined') return
+
+    // Wait for DOM to be ready
+    nextTick(() => {
+      const height = document.documentElement.scrollHeight
+
+      // Send height to parent window
+      if (window.parent) {
+        window.parent.postMessage({
+          action: 'tool-changed',
+          height: height
+        }, '*')
+      }
+    })
   }
 
   const getCurrentStory = () => currentStory.value
@@ -37,6 +60,7 @@ export const useStoryblokBridge = () => {
     currentSpace,
     isInitialized,
     initBridge,
+    updateHeight,
     getCurrentStory,
     getCurrentSpace
   }
