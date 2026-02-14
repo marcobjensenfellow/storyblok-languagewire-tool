@@ -73,7 +73,7 @@
 <script setup lang="ts">
 import type { StoryblokFolder } from '~/types/storyblok'
 
-const { currentStory, currentSpace, isInitialized, initBridge, updateHeight } = useStoryblokBridge()
+const { currentStory, currentSpace, isInitialized, initBridge, updateHeight, cleanup } = useStoryblokBridge()
 
 const selectedLanguage = ref('')
 const selectedFolder = ref<number | ''>('')
@@ -193,5 +193,9 @@ onMounted(() => {
   watch([errorMessage, successMessage], () => {
     nextTick(() => updateHeight())
   })
+})
+
+onUnmounted(() => {
+  cleanup()
 })
 </script>

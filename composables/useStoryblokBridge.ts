@@ -4,6 +4,7 @@ export const useStoryblokBridge = () => {
   const currentStory = ref<StoryblokStory | null>(null)
   const currentSpace = ref<StoryblokSpace | null>(null)
   const isInitialized = ref(false)
+  let resizeObserver: ResizeObserver | null = null
 
   const initBridge = () => {
     if (typeof window === 'undefined') return
@@ -20,7 +21,7 @@ export const useStoryblokBridge = () => {
         console.log('Space info:', event.data.space)
 
         // Update height after initialization
-        updateHeight()
+        setTimeout(() => updateHeight(), 100)
       }
     })
 
@@ -31,29 +32,70 @@ export const useStoryblokBridge = () => {
       }, '*')
     }
 
-    // Update height on content changes
-    updateHeight()
+    // Set up ResizeObserver to automatically update height
+    setupResizeObserver()
+
+    // Initial height update
+    setTimeout(() => updateHeight(), 100)
+  }
+
+  const setupResizeObserver = () => {
+    if (typeof window === 'undefined') return
+
+    // Observe changes to document body size
+    resizeObserver = new ResizeObserver(() => {
+      updateHeight()
+    })
+
+    // Start observing the body element
+    if (document.body) {
+      resizeObserver.observe(document.body)
+    }
   }
 
   const updateHeight = () => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined' || !window.parent) return
 
-    // Wait for DOM to be ready
-    nextTick(() => {
-      const height = document.documentElement.scrollHeight
+    // Calculate actual content height
+    const body = document.body
+    const html = document.documentElement
 
-      // Send height to parent window
-      if (window.parent) {
-        window.parent.postMessage({
-          action: 'tool-changed',
-          height: height
-        }, '*')
-      }
-    })
+    const height = Math.max(
+      body.scrollHeight,
+      body.offsetHeight,
+      html.clientHeight,
+      html.scrollHeight,
+      html.offsetHeight
+    )
+
+    console.log('Updating iframe height to:', height)
+
+    // Try multiple message formats that Storyblok might use
+    window.parent.postMessage({
+      action: 'tool-changed',
+      height: height
+    }, '*')
+
+    window.parent.postMessage({
+      type: 'resize',
+      height: height
+    }, '*')
+
+    window.parent.postMessage({
+      event: 'resize-iframe',
+      height: height
+    }, '*')
   }
 
   const getCurrentStory = () => currentStory.value
   const getCurrentSpace = () => currentSpace.value
+
+  const cleanup = () => {
+    if (resizeObserver) {
+      resizeObserver.disconnect()
+      resizeObserver = null
+    }
+  }
 
   return {
     currentStory,
@@ -61,6 +103,7 @@ export const useStoryblokBridge = () => {
     isInitialized,
     initBridge,
     updateHeight,
+    cleanup,
     getCurrentStory,
     getCurrentSpace
   }
