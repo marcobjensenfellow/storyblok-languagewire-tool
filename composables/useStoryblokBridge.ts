@@ -9,34 +9,86 @@ export const useStoryblokBridge = () => {
   const initBridge = () => {
     if (typeof window === 'undefined') return
 
-    // Listen for messages from Storyblok
+    console.log('Initializing Storyblok bridge...')
+
+    // Listen for ALL messages from Storyblok to debug
     window.addEventListener('message', (event) => {
-      if (event.data.action === 'tool-init') {
+      console.log('Received message:', event.data)
+
+      // Handle different message formats
+      if (event.data.action === 'tool-init' || event.data.action === 'input') {
         // Store current story and space information
-        currentStory.value = event.data.story
+        currentStory.value = event.data.story || event.data.model
         currentSpace.value = event.data.space
         isInitialized.value = true
 
-        console.log('Tool initialized with story:', event.data.story)
-        console.log('Space info:', event.data.space)
+        console.log('Tool initialized with story:', currentStory.value)
+        console.log('Space info:', currentSpace.value)
 
         // Update height after initialization
         setTimeout(() => updateHeight(), 100)
       }
+
+      // Alternative: Try to extract space from story URL
+      if (event.data.story && !currentSpace.value) {
+        tryExtractSpaceFromUrl()
+      }
     })
 
-    // Notify Storyblok that the tool is ready
+    // Notify Storyblok that the tool is ready (multiple formats)
     if (window.parent) {
       window.parent.postMessage({
         action: 'tool-ready'
       }, '*')
+
+      window.parent.postMessage({
+        type: 'loaded'
+      }, '*')
+
+      console.log('Sent ready messages to parent')
     }
+
+    // Try to get space from URL as fallback
+    tryExtractSpaceFromUrl()
 
     // Set up ResizeObserver to automatically update height
     setupResizeObserver()
 
     // Initial height update
     setTimeout(() => updateHeight(), 100)
+  }
+
+  const tryExtractSpaceFromUrl = () => {
+    if (currentSpace.value) return // Already have space
+
+    // Try to get space ID from query params or referrer
+    const urlParams = new URLSearchParams(window.location.search)
+    const spaceIdParam = urlParams.get('space_id')
+
+    if (spaceIdParam) {
+      console.log('Found space_id in URL:', spaceIdParam)
+      currentSpace.value = {
+        id: parseInt(spaceIdParam),
+        name: 'Space',
+        domain: '',
+        version: 1,
+        language_codes: []
+      }
+    } else if (window.location.ancestorOrigins && window.location.ancestorOrigins.length > 0) {
+      // Try to extract from parent URL
+      const parentUrl = window.location.ancestorOrigins[0]
+      console.log('Parent URL:', parentUrl)
+    } else {
+      // Hardcode your space ID as last resort
+      console.log('Using hardcoded space ID: 288946579053471')
+      currentSpace.value = {
+        id: 288946579053471,
+        name: 'Fellow Space',
+        domain: '',
+        version: 1,
+        language_codes: ['da', 'en']
+      }
+    }
   }
 
   const setupResizeObserver = () => {
