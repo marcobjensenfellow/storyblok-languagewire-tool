@@ -13,6 +13,8 @@ export const useStoryblokBridge = () => {
 
     // Listen for ALL messages from Storyblok to debug
     window.addEventListener('message', (event) => {
+      // Skip logging requestly messages to reduce spam
+      if (event.data?.source === 'requestly:client') return
       console.log('Received message:', event.data)
 
       // Handle different message formats
@@ -120,7 +122,7 @@ export const useStoryblokBridge = () => {
       html.offsetHeight
     )
 
-    console.log('Updating iframe height to:', height)
+    // console.log('Updating iframe height to:', height) // Disabled to reduce console spam
 
     // Try multiple message formats that Storyblok might use
     window.parent.postMessage({
