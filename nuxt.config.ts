@@ -15,5 +15,16 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  app: {
+    head: {
+      link: [
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap'
+        }
+      ]
+    }
+  },
+
   compatibilityDate: '2024-12-01'
 })

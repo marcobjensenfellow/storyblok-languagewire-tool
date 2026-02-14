@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="card">
-      <h1 style="margin-bottom: 20px; font-size: 24px;">Language Wire Oversættelse</h1>
+      <h1>Language Wire Oversættelse</h1>
 
       <!-- Current Story Info -->
       <div v-if="currentStory" class="info-box">
@@ -66,17 +66,6 @@
         <span v-if="isTranslating" class="loading"></span>
         {{ isTranslating ? 'Oversætter...' : 'Translate page' }}
       </button>
-    </div>
-
-    <!-- Info Card -->
-    <div class="card" style="font-size: 14px; color: #64748b;">
-      <p><strong>Hvordan virker det?</strong></p>
-      <p style="margin-top: 8px;">
-        1. Vælg det sprog du vil oversætte til<br>
-        2. Vælg hvilken mappe den nye oversatte side skal oprettes i<br>
-        3. Klik på "Translate page" for at sende siden til Language Wire<br>
-        4. Når oversættelsen er klar, oprettes en ny side automatisk med en kommentar
-      </p>
     </div>
   </div>
 </template>
