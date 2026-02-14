@@ -72,14 +72,18 @@ export default defineEventHandler(async (event): Promise<StoryblokFolder[]> => {
     folders.sort((a, b) => a.name.localeCompare(b.name))
 
     console.log('✅ Successfully loaded', folders.length, 'folders:', folders.map(f => f.name).join(', '))
+    console.log('🚀 RETURNING REAL FOLDERS TO CLIENT:', folders.length, 'items')
 
     return folders
 
   } catch (error: any) {
-    console.error('Error fetching folders:', error)
+    console.error('❌❌❌ CRITICAL ERROR fetching folders:', error)
+    console.error('Error type:', error?.constructor?.name)
+    console.error('Error message:', error?.message)
+    console.error('Error stack:', error?.stack)
 
     // Fallback to mock data on error
-    console.log('Returning mock data due to error')
+    console.log('⚠️ Returning mock data due to error')
     return getMockFolders()
   }
 })
