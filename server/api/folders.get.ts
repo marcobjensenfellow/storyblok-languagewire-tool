@@ -16,28 +16,43 @@ export default defineEventHandler(async (event): Promise<StoryblokFolder[]> => {
     const accessToken = config.storyblokAccessToken
 
     if (!accessToken) {
-      console.warn('No Storyblok access token configured, returning mock data')
+      console.warn('⚠️ No Storyblok access token configured, returning mock data')
+      console.warn('Please add STORYBLOK_ACCESS_TOKEN to Vercel environment variables')
       return getMockFolders()
     }
 
-    console.log('Fetching folders for space:', spaceId)
+    console.log('✅ Access token found, length:', accessToken.length)
+    console.log('📡 Fetching folders for space:', spaceId)
+
+    const url = `https://mapi.storyblok.com/v1/spaces/${spaceId}/stories?is_folder=1&per_page=100`
+    console.log('🔗 API URL:', url)
 
     // Fetch folders from Storyblok Management API
-    const response = await fetch(
-      `https://mapi.storyblok.com/v1/spaces/${spaceId}/stories?is_folder=1&per_page=100`,
-      {
-        headers: {
-          'Authorization': accessToken
-        }
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': accessToken
       }
-    )
+    })
+
+    console.log('📥 Response status:', response.status, response.statusText)
 
     if (!response.ok) {
-      console.error('Storyblok API error:', response.status, response.statusText)
-      throw new Error(`Storyblok API returned ${response.status}`)
+      const errorText = await response.text()
+      console.error('❌ Storyblok API error:', response.status, response.statusText)
+      console.error('Error body:', errorText)
+      throw new Error(`Storyblok API returned ${response.status}: ${errorText}`)
     }
 
     const data = await response.json()
+    console.log('📦 Received data:', {
+      storiesCount: data.stories?.length || 0,
+      hasStories: !!data.stories
+    })
+
+    if (!data.stories || data.stories.length === 0) {
+      console.warn('⚠️ No folders found in response, using mock data')
+      return getMockFolders()
+    }
 
     // Transform Storyblok stories to our folder format
     const folders: StoryblokFolder[] = data.stories.map((story: any) => ({
@@ -50,6 +65,8 @@ export default defineEventHandler(async (event): Promise<StoryblokFolder[]> => {
 
     // Sort alphabetically by name
     folders.sort((a, b) => a.name.localeCompare(b.name))
+
+    console.log('✅ Successfully loaded', folders.length, 'folders:', folders.map(f => f.name).join(', '))
 
     return folders
 
