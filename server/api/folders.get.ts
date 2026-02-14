@@ -28,9 +28,14 @@ export default defineEventHandler(async (event): Promise<StoryblokFolder[]> => {
     console.log('🔗 API URL:', url)
 
     // Fetch folders from Storyblok Management API
+    // Try both token formats (with and without Bearer prefix)
+    const authHeader = accessToken.startsWith('Bearer ') ? accessToken : accessToken
+
+    console.log('🔑 Using auth header (first 10 chars):', authHeader.substring(0, 10) + '...')
+
     const response = await fetch(url, {
       headers: {
-        'Authorization': accessToken
+        'Authorization': authHeader
       }
     })
 
