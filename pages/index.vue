@@ -9,6 +9,14 @@
         <div>{{ currentStory.name }} ({{ currentStory.lang || 'default' }})</div>
       </div>
 
+      <!-- Debug Info (only show if in development or if there's an issue) -->
+      <div v-if="!currentSpace && !isLoadingFolders" class="info-box" style="background-color: #fff5f5; border-color: #feb2b2;">
+        <div class="info-title" style="color: #c53030;">Debug Info</div>
+        <div style="color: #c53030; font-size: 12px;">
+          Space not loaded yet. Waiting for Storyblok to send space data...
+        </div>
+      </div>
+
       <!-- Error Message -->
       <div v-if="errorMessage" class="error-message">
         {{ errorMessage }}
@@ -40,7 +48,7 @@
 
       <!-- Target Folder Selection -->
       <div class="form-group">
-        <label for="target-folder">Målmappe</label>
+        <label for="target-folder">Målmappe ({{ folders.length }} mapper)</label>
         <select
           id="target-folder"
           v-model="selectedFolder"
@@ -140,17 +148,38 @@ const handleTranslate = async () => {
 }
 
 const fetchFolders = async () => {
-  if (!currentSpace.value?.id) return
+  if (!currentSpace.value?.id) {
+    console.log('No space ID available, cannot fetch folders')
+    return
+  }
 
+  console.log('Fetching folders for space:', currentSpace.value.id)
   isLoadingFolders.value = true
+
   try {
     const response = await $fetch<StoryblokFolder[]>(`/api/folders?space_id=${currentSpace.value.id}`)
     folders.value = response
     console.log('Loaded folders:', response)
+    console.log('Number of folders:', response.length)
     nextTick(() => updateHeight())
   } catch (error: any) {
     console.error('Error loading folders:', error)
-    errorMessage.value = 'Kunne ikke hente mapper fra Storyblok'
+
+    // Show user-friendly error
+    if (error.statusCode === 401) {
+      errorMessage.value = 'Access token mangler eller er ugyldig. Tjek Vercel environment variables.'
+    } else {
+      errorMessage.value = 'Kunne ikke hente mapper fra Storyblok. Bruger eksempel mapper.'
+    }
+
+    // Fallback to mock folders
+    folders.value = [
+      { id: 1, name: 'Home', slug: 'home', parent_id: null, is_folder: true },
+      { id: 2, name: 'Produkter', slug: 'produkter', parent_id: null, is_folder: true },
+      { id: 3, name: 'Om os', slug: 'om-os', parent_id: null, is_folder: true },
+      { id: 4, name: 'Blog', slug: 'blog', parent_id: null, is_folder: true }
+    ]
+    console.log('Using fallback folders:', folders.value)
   } finally {
     isLoadingFolders.value = false
   }
