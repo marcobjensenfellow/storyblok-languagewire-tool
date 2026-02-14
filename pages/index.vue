@@ -158,12 +158,20 @@ const fetchFolders = async () => {
 
   try {
     const response = await $fetch<StoryblokFolder[]>(`/api/folders?space_id=${currentSpace.value.id}`)
+    console.log('📥 API Response received:', response)
+    console.log('📦 Response is array:', Array.isArray(response))
+    console.log('📊 Response length:', response?.length)
+
     folders.value = response
-    console.log('Loaded folders:', response)
-    console.log('Number of folders:', response.length)
-    nextTick(() => updateHeight())
+    console.log('✅ Folders set in state:', folders.value.length)
+    console.log('📋 Folder names:', folders.value.map(f => f.name).join(', '))
+
+    nextTick(() => {
+      console.log('🔄 After nextTick, folders count:', folders.value.length)
+      updateHeight()
+    })
   } catch (error: any) {
-    console.error('Error loading folders:', error)
+    console.error('❌ Error loading folders:', error)
 
     // Show user-friendly error
     if (error.statusCode === 401) {
